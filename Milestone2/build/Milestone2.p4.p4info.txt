@@ -26,9 +26,9 @@ tables {
 }
 tables {
   preamble {
-    id: 41423289
-    name: "MyIngress.ecmp_group"
-    alias: "ecmp_group"
+    id: 46962666
+    name: "MyIngress.per_packet_group"
+    alias: "per_packet_group"
   }
   match_fields {
     id: 1
@@ -40,7 +40,7 @@ tables {
     id: 25652968
   }
   action_refs {
-    id: 28332005
+    id: 18649058
   }
   action_refs {
     id: 21257015
@@ -51,14 +51,14 @@ tables {
 }
 tables {
   preamble {
-    id: 42718419
-    name: "MyIngress.ecmp_nhop"
-    alias: "ecmp_nhop"
+    id: 39559185
+    name: "MyIngress.per_packet_nhop"
+    alias: "per_packet_nhop"
   }
   match_fields {
     id: 1
-    name: "meta.ecmp_select"
-    bitwidth: 14
+    name: "meta.per_packet_select"
+    bitwidth: 32
     match_type: EXACT
   }
   action_refs {
@@ -72,7 +72,7 @@ tables {
     annotations: "@defaultonly"
     scope: DEFAULT_ONLY
   }
-  size: 2
+  size: 1024
 }
 actions {
   preamble {
@@ -108,19 +108,9 @@ actions {
 }
 actions {
   preamble {
-    id: 28332005
-    name: "MyIngress.set_ecmp_select"
-    alias: "set_ecmp_select"
-  }
-  params {
-    id: 1
-    name: "ecmp_base"
-    bitwidth: 16
-  }
-  params {
-    id: 2
-    name: "ecmp_count"
-    bitwidth: 32
+    id: 18649058
+    name: "MyIngress.set_per_packet_select"
+    alias: "set_per_packet_select"
   }
 }
 actions {
@@ -159,6 +149,21 @@ registers {
     }
   }
   size: 6
+}
+registers {
+  preamble {
+    id: 384183860
+    name: "round_robin"
+    alias: "round_robin"
+  }
+  type_spec {
+    bitstring {
+      bit {
+        bitwidth: 32
+      }
+    }
+  }
+  size: 1
 }
 type_info {
 }

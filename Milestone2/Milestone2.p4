@@ -8,6 +8,7 @@ const bit<16> TYPE_PROBE = 0x812;
 const bit<48> H1_MAC_ADDR = 0x080000000111;
 
 register<bit<32>>(6) probe_data;
+register<bit<32>>(1) round_robin;
 
 /*************************************************************************
 *********************** H E A D E R S  ***********************************
@@ -30,6 +31,7 @@ header probe_t {
     bit<32> s1_p3_bytes_count;
     bit<32> total_pkt_count;
     bit<32> total_output_bytes;
+    bit<32> sid;
     bit<16> protocol;
 }
 
@@ -63,7 +65,7 @@ header tcp_t {
 }
 
 struct metadata {
-    bit<14> ecmp_select;
+    bit<32> per_packet_select;
 }
 
 struct headers {
@@ -140,37 +142,32 @@ control MyIngress(inout headers hdr,
     
     /////////////////////////////////// ACTIONS ///////////////////////////////////
     
-         
     action drop() {
         mark_to_drop(standard_metadata);
     }
 
     action ipv4_forward(macAddr_t dstAddr, egressSpec_t port) {
-        // specify the correct port to send to 
-        // by modifing the egress_spec metadata
         standard_metadata.egress_spec = port;
-
-        // Update MAC address: the previous destination was this current switch, 
-        // Now, the source is the current switch,
-        // the destination is the next switch's / host's MAC,
-        // which is defined by ourselves
         hdr.ethernet.srcAddr = hdr.ethernet.dstAddr;
         hdr.ethernet.dstAddr = dstAddr;
-
-        // decrement ttl
         hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
     }
+    
+    action set_per_packet_select() {
+        // change the local variable to be the next hop
+        // don't change register here! Change it in set_nhop
 
-    action set_ecmp_select(bit<16> ecmp_base, bit<32> ecmp_count) {
-        hash(meta.ecmp_select,
-            HashAlgorithm.crc16,
-            ecmp_base,
-            { hdr.ipv4.srcAddr,
-              hdr.ipv4.dstAddr,
-              hdr.ipv4.protocol,
-              hdr.tcp.srcPort,
-              hdr.tcp.dstPort },
-            ecmp_count);
+        // declare a temp register to hold round_robin 
+        // (or maybe directly assign round_robin to meta.per_packet_select)
+        round_robin.read(meta.per_packet_select, 0);
+
+        // if meta.per_packet_select = 0, then make it 1. Vice versa
+        if (meta.per_packet_select == 0){
+            meta.per_packet_select = 1;
+        }
+        else{
+            meta.per_packet_select = 0;
+        }
     }
 
     action set_nhop(bit<48> nhop_dmac, bit<32> nhop_ipv4, bit<9> port) {
@@ -180,6 +177,7 @@ control MyIngress(inout headers hdr,
         standard_metadata.egress_spec = port;
         hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
     }
+
 
     /////////////////////////////////// TABLES ///////////////////////////////////
     
@@ -196,26 +194,26 @@ control MyIngress(inout headers hdr,
         default_action = NoAction();
     }
 
-    table ecmp_group {
+    table per_packet_group {
         key = {
             hdr.ipv4.dstAddr: lpm;
         }
         actions = {
             drop;
-            set_ecmp_select;
+            set_per_packet_select;
         }
         size = 1024;
     }
 
-    table ecmp_nhop {
+    table per_packet_nhop {
         key = {
-            meta.ecmp_select: exact;
+            meta.per_packet_select: exact;
         }
         actions = {
             drop;
             set_nhop;
         }
-        size = 2;
+        size = 1024;
     }
 
     /////////////////////////////////// LOGICS ///////////////////////////////////
@@ -225,8 +223,12 @@ control MyIngress(inout headers hdr,
         if (hdr.ipv4.isValid() && hdr.ipv4.ttl > 0){
 
             if (hdr.ethernet.srcAddr == H1_MAC_ADDR){
-                ecmp_group.apply();
-                ecmp_nhop.apply();
+                // no ecmp anymore, we use round robin
+                per_packet_group.apply();
+                per_packet_nhop.apply();
+
+                // update round_robin 
+                round_robin.write(0, meta.per_packet_select);
 
                 // update monitor data
                 bit<32> s1_p2_pkt_count;
@@ -243,7 +245,7 @@ control MyIngress(inout headers hdr,
                 probe_data.read(total_pkt_count, 4);
                 probe_data.read(total_output_bytes, 5);
 
-                if (meta.ecmp_select == 0){
+                if (meta.per_packet_select == 0){
                     s1_p2_pkt_count = s1_p2_pkt_count + 1;
                     s1_p2_bytes_count = s1_p2_bytes_count + standard_metadata.packet_length;
 

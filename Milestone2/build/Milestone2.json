@@ -4,19 +4,13 @@
       "name" : "scalars_0",
       "id" : 0,
       "fields" : [
-        ["tmp", 32, false],
-        ["tmp_0", 32, false],
-        ["tmp_1", 8, false],
-        ["tmp_2", 16, false],
-        ["tmp_3", 16, false],
         ["s1_p2_pkt_count_0", 32, false],
         ["s1_p2_bytes_count_0", 32, false],
         ["s1_p3_pkt_count_0", 32, false],
         ["s1_p3_bytes_count_0", 32, false],
         ["total_pkt_count_0", 32, false],
         ["total_output_bytes_0", 32, false],
-        ["userMetadata.ecmp_select", 14, false],
-        ["_padding_0", 2, false]
+        ["userMetadata.per_packet_select", 32, false]
       ]
     },
     {
@@ -61,6 +55,7 @@
         ["s1_p3_bytes_count", 32, false],
         ["total_pkt_count", 32, false],
         ["total_output_bytes", 32, false],
+        ["sid", 32, false],
         ["protocol", 16, false]
       ]
     },
@@ -310,7 +305,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "Milestone2.p4",
-        "line" : 321,
+        "line" : 323,
         "column" : 8,
         "source_fragment" : "MyDeparser"
       },
@@ -332,42 +327,27 @@
       },
       "size" : 6,
       "bitwidth" : 32
+    },
+    {
+      "name" : "round_robin",
+      "id" : 1,
+      "source_info" : {
+        "filename" : "Milestone2.p4",
+        "line" : 11,
+        "column" : 21,
+        "source_fragment" : "round_robin"
+      },
+      "size" : 1,
+      "bitwidth" : 32
     }
   ],
   "calculations" : [
     {
       "name" : "calc",
       "id" : 0,
-      "algo" : "crc16",
-      "input" : [
-        {
-          "type" : "field",
-          "value" : ["scalars", "tmp"]
-        },
-        {
-          "type" : "field",
-          "value" : ["scalars", "tmp_0"]
-        },
-        {
-          "type" : "field",
-          "value" : ["scalars", "tmp_1"]
-        },
-        {
-          "type" : "field",
-          "value" : ["scalars", "tmp_2"]
-        },
-        {
-          "type" : "field",
-          "value" : ["scalars", "tmp_3"]
-        }
-      ]
-    },
-    {
-      "name" : "calc_0",
-      "id" : 1,
       "source_info" : {
         "filename" : "Milestone2.p4",
-        "line" : 298,
+        "line" : 300,
         "column" : 8,
         "source_fragment" : "update_checksum( ..."
       },
@@ -455,7 +435,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 145,
+            "line" : 146,
             "column" : 8,
             "source_fragment" : "mark_to_drop(standard_metadata)"
           }
@@ -477,7 +457,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 145,
+            "line" : 146,
             "column" : 8,
             "source_fragment" : "mark_to_drop(standard_metadata)"
           }
@@ -499,7 +479,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 145,
+            "line" : 146,
             "column" : 8,
             "source_fragment" : "mark_to_drop(standard_metadata)"
           }
@@ -534,7 +514,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 151,
+            "line" : 150,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = port"
           }
@@ -553,7 +533,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 157,
+            "line" : 151,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.srcAddr = hdr.ethernet.dstAddr"
           }
@@ -572,7 +552,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 158,
+            "line" : 152,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.dstAddr = dstAddr"
           }
@@ -614,7 +594,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 161,
+            "line" : 153,
             "column" : 8,
             "source_fragment" : "hdr.ipv4.ttl = hdr.ipv4.ttl - 1"
           }
@@ -622,140 +602,72 @@
       ]
     },
     {
-      "name" : "MyIngress.set_ecmp_select",
+      "name" : "MyIngress.set_per_packet_select",
       "id" : 7,
-      "runtime_data" : [
-        {
-          "name" : "ecmp_base",
-          "bitwidth" : 16
-        },
-        {
-          "name" : "ecmp_count",
-          "bitwidth" : 32
-        }
-      ],
+      "runtime_data" : [],
       "primitives" : [
         {
-          "op" : "assign",
+          "op" : "register_read",
           "parameters" : [
             {
               "type" : "field",
-              "value" : ["scalars", "tmp"]
+              "value" : ["scalars", "userMetadata.per_packet_select"]
             },
             {
-              "type" : "field",
-              "value" : ["ipv4", "srcAddr"]
+              "type" : "register_array",
+              "value" : "round_robin"
+            },
+            {
+              "type" : "hexstr",
+              "value" : "0x00000000"
             }
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 168,
-            "column" : 14,
-            "source_fragment" : "hdr.ipv4.srcAddr"
-          }
-        },
-        {
-          "op" : "assign",
-          "parameters" : [
-            {
-              "type" : "field",
-              "value" : ["scalars", "tmp_0"]
-            },
-            {
-              "type" : "field",
-              "value" : ["ipv4", "dstAddr"]
-            }
-          ],
-          "source_info" : {
-            "filename" : "Milestone2.p4",
-            "line" : 169,
-            "column" : 14,
-            "source_fragment" : "hdr.ipv4.dstAddr"
-          }
-        },
-        {
-          "op" : "assign",
-          "parameters" : [
-            {
-              "type" : "field",
-              "value" : ["scalars", "tmp_1"]
-            },
-            {
-              "type" : "field",
-              "value" : ["ipv4", "protocol"]
-            }
-          ],
-          "source_info" : {
-            "filename" : "Milestone2.p4",
-            "line" : 170,
-            "column" : 14,
-            "source_fragment" : "hdr.ipv4.protocol"
-          }
-        },
-        {
-          "op" : "assign",
-          "parameters" : [
-            {
-              "type" : "field",
-              "value" : ["scalars", "tmp_2"]
-            },
-            {
-              "type" : "field",
-              "value" : ["tcp", "srcPort"]
-            }
-          ],
-          "source_info" : {
-            "filename" : "Milestone2.p4",
-            "line" : 171,
-            "column" : 14,
-            "source_fragment" : "hdr.tcp.srcPort"
-          }
-        },
-        {
-          "op" : "assign",
-          "parameters" : [
-            {
-              "type" : "field",
-              "value" : ["scalars", "tmp_3"]
-            },
-            {
-              "type" : "field",
-              "value" : ["tcp", "dstPort"]
-            }
-          ],
-          "source_info" : {
-            "filename" : "Milestone2.p4",
-            "line" : 172,
-            "column" : 14,
-            "source_fragment" : "hdr.tcp.dstPort"
-          }
-        },
-        {
-          "op" : "modify_field_with_hash_based_offset",
-          "parameters" : [
-            {
-              "type" : "field",
-              "value" : ["scalars", "userMetadata.ecmp_select"]
-            },
-            {
-              "type" : "runtime_data",
-              "value" : 0
-            },
-            {
-              "type" : "calculation",
-              "value" : "calc"
-            },
-            {
-              "type" : "runtime_data",
-              "value" : 1
-            }
-          ],
-          "source_info" : {
-            "filename" : "Milestone2.p4",
-            "line" : 165,
+            "line" : 162,
             "column" : 8,
-            "source_fragment" : "hash(meta.ecmp_select, ..."
+            "source_fragment" : "round_robin.read(meta.per_packet_select, 0)"
           }
+        },
+        {
+          "op" : "assign",
+          "parameters" : [
+            {
+              "type" : "field",
+              "value" : ["scalars", "userMetadata.per_packet_select"]
+            },
+            {
+              "type" : "expression",
+              "value" : {
+                "type" : "expression",
+                "value" : {
+                  "op" : "?",
+                  "left" : {
+                    "type" : "hexstr",
+                    "value" : "0x00000001"
+                  },
+                  "right" : {
+                    "type" : "hexstr",
+                    "value" : "0x00000000"
+                  },
+                  "cond" : {
+                    "type" : "expression",
+                    "value" : {
+                      "op" : "==",
+                      "left" : {
+                        "type" : "field",
+                        "value" : ["scalars", "userMetadata.per_packet_select"]
+                      },
+                      "right" : {
+                        "type" : "hexstr",
+                        "value" : "0x00000000"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -791,7 +703,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 177,
+            "line" : 174,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.srcAddr = hdr.ethernet.dstAddr"
           }
@@ -810,7 +722,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 178,
+            "line" : 175,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.dstAddr = nhop_dmac"
           }
@@ -829,7 +741,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 179,
+            "line" : 176,
             "column" : 8,
             "source_fragment" : "hdr.ipv4.dstAddr = nhop_ipv4"
           }
@@ -848,7 +760,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 180,
+            "line" : 177,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = port"
           }
@@ -890,7 +802,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 181,
+            "line" : 178,
             "column" : 8,
             "source_fragment" : "hdr.ipv4.ttl = hdr.ipv4.ttl - 1"
           }
@@ -898,7 +810,7 @@
       ]
     },
     {
-      "name" : "Milestone2l247",
+      "name" : "Milestone2l249",
       "id" : 9,
       "runtime_data" : [],
       "primitives" : [
@@ -939,7 +851,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 247,
+            "line" : 249,
             "column" : 20,
             "source_fragment" : "s1_p2_pkt_count = s1_p2_pkt_count + 1"
           }
@@ -981,7 +893,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 248,
+            "line" : 250,
             "column" : 20,
             "source_fragment" : "s1_p2_bytes_count = s1_p2_bytes_count + standard_metadata.packet_length"
           }
@@ -1004,7 +916,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 250,
+            "line" : 252,
             "column" : 20,
             "source_fragment" : "probe_data.write(0, s1_p2_pkt_count)"
           }
@@ -1027,7 +939,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 251,
+            "line" : 253,
             "column" : 20,
             "source_fragment" : "probe_data.write(1, s1_p2_bytes_count)"
           }
@@ -1035,7 +947,7 @@
       ]
     },
     {
-      "name" : "Milestone2l255",
+      "name" : "Milestone2l257",
       "id" : 10,
       "runtime_data" : [],
       "primitives" : [
@@ -1076,7 +988,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 255,
+            "line" : 257,
             "column" : 20,
             "source_fragment" : "s1_p3_pkt_count = s1_p3_pkt_count + 1"
           }
@@ -1118,7 +1030,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 256,
+            "line" : 258,
             "column" : 20,
             "source_fragment" : "s1_p3_bytes_count = s1_p3_bytes_count + standard_metadata.packet_length"
           }
@@ -1141,7 +1053,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 258,
+            "line" : 260,
             "column" : 20,
             "source_fragment" : "probe_data.write(2, s1_p3_pkt_count)"
           }
@@ -1164,7 +1076,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 259,
+            "line" : 261,
             "column" : 20,
             "source_fragment" : "probe_data.write(3, s1_p3_bytes_count)"
           }
@@ -1172,10 +1084,33 @@
       ]
     },
     {
-      "name" : "Milestone2l239",
+      "name" : "Milestone2l231",
       "id" : 11,
       "runtime_data" : [],
       "primitives" : [
+        {
+          "op" : "register_write",
+          "parameters" : [
+            {
+              "type" : "register_array",
+              "value" : "round_robin"
+            },
+            {
+              "type" : "hexstr",
+              "value" : "0x00000000"
+            },
+            {
+              "type" : "field",
+              "value" : ["scalars", "userMetadata.per_packet_select"]
+            }
+          ],
+          "source_info" : {
+            "filename" : "Milestone2.p4",
+            "line" : 231,
+            "column" : 16,
+            "source_fragment" : "round_robin.write(0, meta.per_packet_select)"
+          }
+        },
         {
           "op" : "register_read",
           "parameters" : [
@@ -1194,7 +1129,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 239,
+            "line" : 241,
             "column" : 16,
             "source_fragment" : "probe_data.read(s1_p2_pkt_count, 0)"
           }
@@ -1217,7 +1152,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 240,
+            "line" : 242,
             "column" : 16,
             "source_fragment" : "probe_data.read(s1_p2_bytes_count, 1)"
           }
@@ -1240,7 +1175,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 241,
+            "line" : 243,
             "column" : 16,
             "source_fragment" : "probe_data.read(s1_p3_pkt_count, 2)"
           }
@@ -1263,7 +1198,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 242,
+            "line" : 244,
             "column" : 16,
             "source_fragment" : "probe_data.read(s1_p3_bytes_count, 3)"
           }
@@ -1286,7 +1221,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 243,
+            "line" : 245,
             "column" : 16,
             "source_fragment" : "probe_data.read(total_pkt_count, 4)"
           }
@@ -1309,7 +1244,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 244,
+            "line" : 246,
             "column" : 16,
             "source_fragment" : "probe_data.read(total_output_bytes, 5)"
           }
@@ -1317,7 +1252,7 @@
       ]
     },
     {
-      "name" : "Milestone2l261",
+      "name" : "Milestone2l263",
       "id" : 12,
       "runtime_data" : [],
       "primitives" : [
@@ -1358,7 +1293,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 261,
+            "line" : 263,
             "column" : 16,
             "source_fragment" : "total_pkt_count = total_pkt_count + 1"
           }
@@ -1400,7 +1335,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 262,
+            "line" : 264,
             "column" : 16,
             "source_fragment" : "total_output_bytes = total_output_bytes + standard_metadata.packet_length"
           }
@@ -1423,7 +1358,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 263,
+            "line" : 265,
             "column" : 16,
             "source_fragment" : "probe_data.write(4, total_pkt_count)"
           }
@@ -1446,7 +1381,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 264,
+            "line" : 266,
             "column" : 16,
             "source_fragment" : "probe_data.write(5, total_output_bytes)"
           }
@@ -1465,7 +1400,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 266,
+            "line" : 268,
             "column" : 16,
             "source_fragment" : "hdr.probe.s1_p2_pkt_count = s1_p2_pkt_count"
           }
@@ -1484,7 +1419,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 267,
+            "line" : 269,
             "column" : 16,
             "source_fragment" : "hdr.probe.s1_p2_bytes_count = s1_p2_bytes_count"
           }
@@ -1503,7 +1438,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 268,
+            "line" : 270,
             "column" : 16,
             "source_fragment" : "hdr.probe.s1_p3_pkt_count = s1_p3_pkt_count"
           }
@@ -1522,7 +1457,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 269,
+            "line" : 271,
             "column" : 16,
             "source_fragment" : "hdr.probe.s1_p3_bytes_count = s1_p3_bytes_count"
           }
@@ -1541,7 +1476,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 270,
+            "line" : 272,
             "column" : 16,
             "source_fragment" : "hdr.probe.total_pkt_count = total_pkt_count"
           }
@@ -1560,7 +1495,7 @@
           ],
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 271,
+            "line" : 273,
             "column" : 16,
             "source_fragment" : "hdr.probe.total_output_bytes = total_output_bytes"
           }
@@ -1574,20 +1509,20 @@
       "id" : 0,
       "source_info" : {
         "filename" : "Milestone2.p4",
-        "line" : 136,
+        "line" : 138,
         "column" : 8,
         "source_fragment" : "MyIngress"
       },
       "init_table" : "node_2",
       "tables" : [
         {
-          "name" : "MyIngress.ecmp_group",
+          "name" : "MyIngress.per_packet_group",
           "id" : 0,
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 199,
+            "line" : 197,
             "column" : 10,
-            "source_fragment" : "ecmp_group"
+            "source_fragment" : "per_packet_group"
           },
           "key" : [
             {
@@ -1604,12 +1539,12 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [4, 7, 1],
-          "actions" : ["MyIngress.drop", "MyIngress.set_ecmp_select", "NoAction"],
-          "base_default_next" : "MyIngress.ecmp_nhop",
+          "actions" : ["MyIngress.drop", "MyIngress.set_per_packet_select", "NoAction"],
+          "base_default_next" : "MyIngress.per_packet_nhop",
           "next_tables" : {
-            "MyIngress.drop" : "MyIngress.ecmp_nhop",
-            "MyIngress.set_ecmp_select" : "MyIngress.ecmp_nhop",
-            "NoAction" : "MyIngress.ecmp_nhop"
+            "MyIngress.drop" : "MyIngress.per_packet_nhop",
+            "MyIngress.set_per_packet_select" : "MyIngress.per_packet_nhop",
+            "NoAction" : "MyIngress.per_packet_nhop"
           },
           "default_entry" : {
             "action_id" : 1,
@@ -1619,35 +1554,35 @@
           }
         },
         {
-          "name" : "MyIngress.ecmp_nhop",
+          "name" : "MyIngress.per_packet_nhop",
           "id" : 1,
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 210,
+            "line" : 208,
             "column" : 10,
-            "source_fragment" : "ecmp_nhop"
+            "source_fragment" : "per_packet_nhop"
           },
           "key" : [
             {
               "match_type" : "exact",
-              "name" : "meta.ecmp_select",
-              "target" : ["scalars", "userMetadata.ecmp_select"],
+              "name" : "meta.per_packet_select",
+              "target" : ["scalars", "userMetadata.per_packet_select"],
               "mask" : null
             }
           ],
           "match_type" : "exact",
           "type" : "simple",
-          "max_size" : 2,
+          "max_size" : 1024,
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [5, 8, 2],
           "actions" : ["MyIngress.drop", "MyIngress.set_nhop", "NoAction"],
-          "base_default_next" : "tbl_Milestone2l239",
+          "base_default_next" : "tbl_Milestone2l231",
           "next_tables" : {
-            "MyIngress.drop" : "tbl_Milestone2l239",
-            "MyIngress.set_nhop" : "tbl_Milestone2l239",
-            "NoAction" : "tbl_Milestone2l239"
+            "MyIngress.drop" : "tbl_Milestone2l231",
+            "MyIngress.set_nhop" : "tbl_Milestone2l231",
+            "NoAction" : "tbl_Milestone2l231"
           },
           "default_entry" : {
             "action_id" : 2,
@@ -1657,13 +1592,13 @@
           }
         },
         {
-          "name" : "tbl_Milestone2l239",
+          "name" : "tbl_Milestone2l231",
           "id" : 2,
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 239,
+            "line" : 231,
             "column" : 16,
-            "source_fragment" : "probe_data.read(s1_p2_pkt_count, 0); ..."
+            "source_fragment" : "round_robin.write(0, meta.per_packet_select); ..."
           },
           "key" : [],
           "match_type" : "exact",
@@ -1673,10 +1608,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [11],
-          "actions" : ["Milestone2l239"],
+          "actions" : ["Milestone2l231"],
           "base_default_next" : "node_7",
           "next_tables" : {
-            "Milestone2l239" : "node_7"
+            "Milestone2l231" : "node_7"
           },
           "default_entry" : {
             "action_id" : 11,
@@ -1686,11 +1621,11 @@
           }
         },
         {
-          "name" : "tbl_Milestone2l247",
+          "name" : "tbl_Milestone2l249",
           "id" : 3,
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 247,
+            "line" : 249,
             "column" : 36,
             "source_fragment" : "= s1_p2_pkt_count + 1; ..."
           },
@@ -1702,10 +1637,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [9],
-          "actions" : ["Milestone2l247"],
-          "base_default_next" : "tbl_Milestone2l261",
+          "actions" : ["Milestone2l249"],
+          "base_default_next" : "tbl_Milestone2l263",
           "next_tables" : {
-            "Milestone2l247" : "tbl_Milestone2l261"
+            "Milestone2l249" : "tbl_Milestone2l263"
           },
           "default_entry" : {
             "action_id" : 9,
@@ -1715,11 +1650,11 @@
           }
         },
         {
-          "name" : "tbl_Milestone2l255",
+          "name" : "tbl_Milestone2l257",
           "id" : 4,
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 255,
+            "line" : 257,
             "column" : 36,
             "source_fragment" : "= s1_p3_pkt_count + 1; ..."
           },
@@ -1731,10 +1666,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [10],
-          "actions" : ["Milestone2l255"],
-          "base_default_next" : "tbl_Milestone2l261",
+          "actions" : ["Milestone2l257"],
+          "base_default_next" : "tbl_Milestone2l263",
           "next_tables" : {
-            "Milestone2l255" : "tbl_Milestone2l261"
+            "Milestone2l257" : "tbl_Milestone2l263"
           },
           "default_entry" : {
             "action_id" : 10,
@@ -1744,11 +1679,11 @@
           }
         },
         {
-          "name" : "tbl_Milestone2l261",
+          "name" : "tbl_Milestone2l263",
           "id" : 5,
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 261,
+            "line" : 263,
             "column" : 32,
             "source_fragment" : "= total_pkt_count + 1; ..."
           },
@@ -1760,10 +1695,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [12],
-          "actions" : ["Milestone2l261"],
+          "actions" : ["Milestone2l263"],
           "base_default_next" : null,
           "next_tables" : {
-            "Milestone2l261" : null
+            "Milestone2l263" : null
           },
           "default_entry" : {
             "action_id" : 12,
@@ -1777,7 +1712,7 @@
           "id" : 6,
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 186,
+            "line" : 184,
             "column" : 10,
             "source_fragment" : "ipv4_lpm"
           },
@@ -1818,7 +1753,7 @@
           "id" : 0,
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 225,
+            "line" : 223,
             "column" : 12,
             "source_fragment" : "hdr.ipv4.isValid() && hdr.ipv4.ttl > 0"
           },
@@ -1861,7 +1796,7 @@
           "id" : 1,
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 227,
+            "line" : 225,
             "column" : 16,
             "source_fragment" : "hdr.ethernet.srcAddr == H1_MAC_ADDR"
           },
@@ -1879,7 +1814,7 @@
               }
             }
           },
-          "true_next" : "MyIngress.ecmp_group",
+          "true_next" : "MyIngress.per_packet_group",
           "false_next" : "MyIngress.ipv4_lpm"
         },
         {
@@ -1887,9 +1822,9 @@
           "id" : 2,
           "source_info" : {
             "filename" : "Milestone2.p4",
-            "line" : 246,
+            "line" : 248,
             "column" : 20,
-            "source_fragment" : "meta.ecmp_select == 0"
+            "source_fragment" : "meta.per_packet_select == 0"
           },
           "expression" : {
             "type" : "expression",
@@ -1897,16 +1832,16 @@
               "op" : "==",
               "left" : {
                 "type" : "field",
-                "value" : ["scalars", "userMetadata.ecmp_select"]
+                "value" : ["scalars", "userMetadata.per_packet_select"]
               },
               "right" : {
                 "type" : "hexstr",
-                "value" : "0x0000"
+                "value" : "0x00000000"
               }
             }
           },
-          "true_next" : "tbl_Milestone2l247",
-          "false_next" : "tbl_Milestone2l255"
+          "true_next" : "tbl_Milestone2l249",
+          "false_next" : "tbl_Milestone2l257"
         }
       ]
     },
@@ -1915,7 +1850,7 @@
       "id" : 1,
       "source_info" : {
         "filename" : "Milestone2.p4",
-        "line" : 286,
+        "line" : 288,
         "column" : 8,
         "source_fragment" : "MyEgress"
       },
@@ -1931,13 +1866,13 @@
       "id" : 0,
       "source_info" : {
         "filename" : "Milestone2.p4",
-        "line" : 298,
+        "line" : 300,
         "column" : 8,
         "source_fragment" : "update_checksum( ..."
       },
       "target" : ["ipv4", "hdrChecksum"],
       "type" : "generic",
-      "calculation" : "calc_0",
+      "calculation" : "calc",
       "verify" : false,
       "update" : true,
       "if_cond" : {

@@ -10,7 +10,7 @@
       "action_params": { }
     },
     {
-      "table": "MyIngress.ecmp_group",
+      "table": "MyIngress.per_packet_group",
       "default_action": true,
       "action_name": "MyIngress.drop",
       "action_params": { }
@@ -27,20 +27,17 @@
       }
     },
     {
-      "table": "MyIngress.ecmp_group",
+      "table": "MyIngress.per_packet_group",
       "match": {
         "hdr.ipv4.dstAddr": ["10.0.2.2", 32]
       },
-      "action_name": "MyIngress.set_ecmp_select",
-      "action_params": {
-        "ecmp_base": 0,
-        "ecmp_count": 2
-      }
+      "action_name": "MyIngress.set_per_packet_select",
+      "action_params": {}
     },
     {
-      "table": "MyIngress.ecmp_nhop",
+      "table": "MyIngress.per_packet_nhop",
       "match": {
-        "meta.ecmp_select": 0
+        "meta.per_packet_select": 0
       },
       "action_name": "MyIngress.set_nhop",
       "action_params": {
@@ -50,9 +47,9 @@
       }
     },
     {
-      "table": "MyIngress.ecmp_nhop",
+      "table": "MyIngress.per_packet_nhop",
       "match": {
-        "meta.ecmp_select": 1
+        "meta.per_packet_select": 1
       },
       "action_name": "MyIngress.set_nhop",
       "action_params": {

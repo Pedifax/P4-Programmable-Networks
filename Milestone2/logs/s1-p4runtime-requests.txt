@@ -1,10 +1,10 @@
 
-[2023-02-18 08:14:05.771] /p4.v1.P4Runtime/SetForwardingPipelineConfig
+[2023-02-19 05:01:52.985] /p4.v1.P4Runtime/SetForwardingPipelineConfig
 ---
-Message too long (62139 bytes)! Skipping log...
+Message too long (60937 bytes)! Skipping log...
 ---
 
-[2023-02-18 08:14:05.776] /p4.v1.P4Runtime/Write
+[2023-02-19 05:01:52.991] /p4.v1.P4Runtime/Write
 ---
 election_id {
   low: 1
@@ -25,7 +25,7 @@ updates {
 }
 ---
 
-[2023-02-18 08:14:05.777] /p4.v1.P4Runtime/Write
+[2023-02-19 05:01:52.992] /p4.v1.P4Runtime/Write
 ---
 election_id {
   low: 1
@@ -34,7 +34,7 @@ updates {
   type: MODIFY
   entity {
     table_entry {
-      table_id: 41423289
+      table_id: 46962666
       action {
         action {
           action_id: 25652968
@@ -46,7 +46,7 @@ updates {
 }
 ---
 
-[2023-02-18 08:14:05.779] /p4.v1.P4Runtime/Write
+[2023-02-19 05:01:52.993] /p4.v1.P4Runtime/Write
 ---
 election_id {
   low: 1
@@ -81,7 +81,7 @@ updates {
 }
 ---
 
-[2023-02-18 08:14:05.779] /p4.v1.P4Runtime/Write
+[2023-02-19 05:01:52.994] /p4.v1.P4Runtime/Write
 ---
 election_id {
   low: 1
@@ -90,7 +90,7 @@ updates {
   type: INSERT
   entity {
     table_entry {
-      table_id: 41423289
+      table_id: 46962666
       match {
         field_id: 1
         lpm {
@@ -100,15 +100,7 @@ updates {
       }
       action {
         action {
-          action_id: 28332005
-          params {
-            param_id: 1
-            value: "\000\000"
-          }
-          params {
-            param_id: 2
-            value: "\000\000\000\002"
-          }
+          action_id: 18649058
         }
       }
     }
@@ -116,7 +108,7 @@ updates {
 }
 ---
 
-[2023-02-18 08:14:05.780] /p4.v1.P4Runtime/Write
+[2023-02-19 05:01:52.994] /p4.v1.P4Runtime/Write
 ---
 election_id {
   low: 1
@@ -125,11 +117,11 @@ updates {
   type: INSERT
   entity {
     table_entry {
-      table_id: 42718419
+      table_id: 39559185
       match {
         field_id: 1
         exact {
-          value: "\000\000"
+          value: "\000\000\000\000"
         }
       }
       action {
@@ -154,7 +146,7 @@ updates {
 }
 ---
 
-[2023-02-18 08:14:05.781] /p4.v1.P4Runtime/Write
+[2023-02-19 05:01:52.995] /p4.v1.P4Runtime/Write
 ---
 election_id {
   low: 1
@@ -163,11 +155,11 @@ updates {
   type: INSERT
   entity {
     table_entry {
-      table_id: 42718419
+      table_id: 39559185
       match {
         field_id: 1
         exact {
-          value: "\000\001"
+          value: "\000\000\000\001"
         }
       }
       action {
