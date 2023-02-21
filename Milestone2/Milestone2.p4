@@ -154,9 +154,6 @@ control MyIngress(inout headers hdr,
     }
     
     action set_per_packet_select() {
-        // change the local variable to be the next hop
-        // don't change register here! Change it in set_nhop
-
         // declare a temp register to hold round_robin 
         // (or maybe directly assign round_robin to meta.per_packet_select)
         round_robin.read(meta.per_packet_select, 0);

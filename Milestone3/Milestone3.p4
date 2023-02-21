@@ -10,9 +10,9 @@ const bit<16> ZERO = 0x0;
 const bit<32> TEN_K = 0x2710;
 
 // last_seen_table is 48 bit because ingress_global_timestamp is 48 bit
-register<bit<32>>(6) probe_data;
 register<bit<48>>(10000) last_seen_table;
 register<bit<14>>(10000) nhop_table;
+register<bit<32>>(6) probe_data;
 
 /*************************************************************************
 *********************** H E A D E R S  ***********************************
